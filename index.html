@@ -122,12 +122,22 @@ h1 { font-size: 22px; font-weight: 700; text-align: center; margin: 12px 0 4px; 
 
   <!-- Tab: Site Test -->
   <div id="tab-test" style="display:none;">
-    <p class="muted" style="margin-bottom:10px;">测试网站可达性（使用当前浏览器 DNS 设置）</p>
-    <div class="row" style="margin-bottom:10px;">
-      <input class="input" id="testUrl" placeholder="https://example.com" style="flex:1" onkeydown="if(event.key==='Enter')testCustom()">
-      <button class="btn btn-primary" onclick="testCustom()">测试</button>
+    <div class="alert-info" style="margin-bottom:12px;">
+      <strong>使用说明</strong><br>
+      请先在浏览器设置中配置好安全 DNS（DoH），再来此页面测试网站可达性。<br>
+      测试使用浏览器当前的 DNS 设置，验证 DoH 是否生效。
     </div>
-    <button class="btn btn-outline" style="width:100%;margin-bottom:10px;" onclick="testPreset()">测试 AO3 / Google / Instagram</button>
+    <button class="btn btn-outline" style="width:100%;margin-bottom:16px;" onclick="testPreset()">测试 AO3 / Google / Instagram</button>
+
+    <div style="border-top:1px solid #e0e0e0;padding-top:12px;margin-bottom:8px;">
+      <div style="font-size:13px;font-weight:600;margin-bottom:6px;">测试其他网站</div>
+      <p class="muted" style="font-size:11px;margin-bottom:8px;">输入任意网址，测试该网站在当前 DNS 设置下是否可达</p>
+      <div class="row" style="margin-bottom:10px;">
+        <input class="input" id="testUrl" placeholder="https://example.com" style="flex:1" onkeydown="if(event.key==='Enter')testCustom()">
+        <button class="btn btn-primary" onclick="testCustom()">测试</button>
+      </div>
+    </div>
+
     <div id="siteResults"></div>
     <div class="alert-warn" style="margin-top:12px;">
       <strong>测试不正常怎么办？</strong><br>
