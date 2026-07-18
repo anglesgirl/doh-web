@@ -87,8 +87,17 @@ h1 { font-size: 22px; font-weight: 700; text-align: center; margin: 12px 0 4px; 
       <strong>Firefox:</strong> 设置 → 隐私与安全 → DNS over HTTPS → 自定义 → 粘贴 URL<br>
       <strong>Chrome:</strong> 设置 → 隐私和安全 → 安全 → 使用安全 DNS → 自定义 → 粘贴 URL<br>
       <strong>Edge:</strong> 设置 → 隐私、搜索和服务 → 安全 → 使用安全 DNS → 自定义 → 粘贴 URL<br>
-      <strong>Safari:</strong> Safari 不支持原生 DoH，需安装 <a href="https://apps.apple.com/cn/app/dnsecure/id1533413232" style="color:#6c5ce7" target="_blank">DNSecure</a> 等 DoH 管理类 App 来启用<br>
+      <strong>Safari / iOS:</strong> 苹果系统不支持浏览器原生 DoH，需安装 <a href="https://apps.apple.com/cn/app/dnsecure/id1533413232" style="color:#6c5ce7" target="_blank">DNSecure</a> App（免费）来全局启用 DoH<br>
       <strong>Android:</strong> 安卓系统不支持原生 DoH，推荐使用 <strong>狐猴浏览器</strong> 等支持 DoH 的浏览器，在浏览器设置中配置<br><br>
+      <strong>DNSecure 使用教程（iOS / iPadOS / macOS）：</strong><br>
+      1. 从 App Store 安装 <a href="https://apps.apple.com/cn/app/dnsecure/id1533413232" style="color:#6c5ce7" target="_blank">DNSecure</a><br>
+      2. 打开 App，点击左上角「+」添加服务器<br>
+      3. 选择协议类型「DNS-over-HTTPS」（注意：选错只能重建，不能修改）<br>
+      4. 在本工具复制一个有效的 DoH URL，粘贴到 DNSecure 的服务器地址栏<br>
+      5. 开启「Use This Server」开关<br>
+      6. 打开系统「设置」→「通用」→「VPN 与设备管理」→「DNS」<br>
+      7. 将 DNS 从「自动」改为「DNSecure」<br>
+      8. 完成！DoH 将全局生效（Safari、所有 App 都走 DoH）<br><br>
       <strong>测试不正常？</strong><br>
       如果设置 DoH 后网站打不开或加载很慢：<br>
       • 检查浏览器是否设置了无效或不稳定的 DoH<br>
