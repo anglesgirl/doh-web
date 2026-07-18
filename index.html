@@ -4,6 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>DoH 检测工具</title>
+<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "xo8cr8lq3w");
+</script>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f7; color: #1d1d1f; }
@@ -71,6 +78,25 @@ h1 { font-size: 22px; font-weight: 700; text-align: center; margin: 12px 0 4px; 
       <button class="btn btn-success btn-sm" onclick="scrape()">重新抓取</button>
     </div>
     <div id="dohList"></div>
+    <div class="alert-warn" style="margin-top:12px;">
+      <strong>如何设置 DoH？</strong><br>
+      1. 在上方找到有效的 DoH，点击「复制」按钮<br>
+      2. 打开浏览器设置，找到 DoH / 安全 DNS 选项<br>
+      3. 选择「自定义」，粘贴复制的 DoH URL<br><br>
+      <strong>各浏览器设置位置：</strong><br>
+      <strong>Firefox:</strong> 设置 → 隐私与安全 → DNS over HTTPS → 自定义 → 粘贴 URL<br>
+      <strong>Chrome:</strong> 设置 → 隐私和安全 → 安全 → 使用安全 DNS → 自定义 → 粘贴 URL<br>
+      <strong>Edge:</strong> 设置 → 隐私、搜索和服务 → 安全 → 使用安全 DNS → 自定义 → 粘贴 URL<br>
+      <strong>Safari:</strong> Safari 不支持原生 DoH，需安装 <a href="https://apps.apple.com/cn/app/dnsecure/id1533413232" style="color:#6c5ce7" target="_blank">DNSecure</a> 等 DoH 管理类 App 来启用<br>
+      <strong>Android:</strong> 安卓系统不支持原生 DoH，推荐使用 <strong>狐猴浏览器</strong> 等支持 DoH 的浏览器，在浏览器设置中配置<br><br>
+      <strong>测试不正常？</strong><br>
+      如果设置 DoH 后网站打不开或加载很慢：<br>
+      • 检查浏览器是否设置了无效或不稳定的 DoH<br>
+      • 回到本工具「DoH 检测」页重测，确认 DoH 状态为「有效」<br>
+      • 换一个延迟更低的 DoH 提供商（延迟 < 100ms 最佳）<br>
+      • 暂时关闭浏览器 DoH，确认是否能恢复访问<br>
+      • 部分网络环境会拦截 DoH 流量，尝试换网络或使用代理
+    </div>
   </div>
 
   <!-- Tab: Saved -->
@@ -94,6 +120,15 @@ h1 { font-size: 22px; font-weight: 700; text-align: center; margin: 12px 0 4px; 
     </div>
     <button class="btn btn-outline" style="width:100%;margin-bottom:10px;" onclick="testPreset()">测试 AO3 / Google / Instagram</button>
     <div id="siteResults"></div>
+    <div class="alert-warn" style="margin-top:12px;">
+      <strong>测试不正常怎么办？</strong><br>
+      如果网站不可访问或加载缓慢，可能是浏览器设置了无效或不稳定的 DoH：<br>
+      • 先到「DoH 检测」页测试你的 DoH 是否仍然有效<br>
+      • 如果 DoH 已失效，更换一个有效的 DoH 提供商<br>
+      • 临时关闭浏览器 DoH（设置为「使用系统 DNS」），确认网站是否恢复<br>
+      • 关闭后恢复 = DoH 问题；关闭后仍不行 = 网络或网站本身问题<br>
+      • 部分公司/学校网络会拦截 DoH，可尝试更换网络环境
+    </div>
   </div>
 
   <div class="toast" id="toast"></div>
@@ -101,10 +136,48 @@ h1 { font-size: 22px; font-weight: 700; text-align: center; margin: 12px 0 4px; 
 
 <script>
 const ADGUARD_URL = "https://adguard-dns.io/kb/zh-CN/general/dns-providers/";
+const PROXY = "/proxy?url=";
 const TEST_SITES = [
   { name: "AO3", url: "https://archiveofourown.org" },
   { name: "Google", url: "https://www.google.com" },
   { name: "Instagram", url: "https://www.instagram.com" },
+];
+
+const PRESET_DOHS = [
+  "https://cloudflare-dns.com/dns-query",
+  "https://dns.google/dns-query",
+  "https://dns.quad9.net/dns-query",
+  "https://dns11.quad9.net/dns-query",
+  "https://doh.opendns.com/dns-query",
+  "https://doh.familyshield.opendns.com/dns-query",
+  "https://mozilla.cloudflare-dns.com/dns-query",
+  "https://dns.cloudflare.com/dns-query",
+  "https://private.canadianshield.cira.ca/dns-query",
+  "https://protected.canadianshield.cira.ca/dns-query",
+  "https://dns0.eu/dns-query",
+  "https://dns0.eu/kids/dns-query",
+  "https://freedns.controld.com/p0/dns-query",
+  "https://freedns.controld.com/p1/dns-query",
+  "https://freedns.controld.com/p2/dns-query",
+  "https://doh.dns.sb/dns-query",
+  "https://doh.applied-privacy.net/dns-query",
+  "https://odvr.nic.cz/doh",
+  "https://dns.rubyfish.cn/dns-query",
+  "https://doh.42l.fr/dns-query",
+  "https://kaitain.restena.lu/dns-query",
+  "https://doh.libredns.gr/dns-query",
+  "https://doh.defaultroutes.de/dns-query",
+  "https://dnsforge.de/dns-query",
+  "https://doh-01.seby.io/dns-query",
+  "https://doh-02.seby.io/dns-query",
+  "https://doh.powerdns.org/dns-query",
+  "https://doh.securedns.eu/dns-query",
+  "https://doh.dnslook.com/dns-query",
+  "https://dns.digitale-gesellschaft.ch/dns-query",
+  "https://dns.twnic.tw/dns-query",
+  "https://doh.pub/dns-query",
+  "https://dns.alidns.com/dns-query",
+  "https://doh.360.cn/dns-query",
 ];
 
 let dohList = [];
@@ -160,18 +233,19 @@ async function scrape() {
   const list = document.getElementById("dohList");
   const stats = document.getElementById("dohStats");
   const actionBar = document.getElementById("actionBar");
-  status.innerHTML = '<div class="alert-info"><span class="spin"></span>正在从 AdGuard 抓取 DoH 列表...</div>';
+  status.innerHTML = '<div class="alert-info"><span class="spin"></span>正在从 AdGuard + 预设列表收集 DoH...</div>';
   list.innerHTML = "";
   stats.innerHTML = "";
   actionBar.style.display = "none";
   dohList = [];
 
+  const urlSet = new Set(PRESET_DOHS);
+
   try {
-    const resp = await fetch(ADGUARD_URL);
+    const resp = await fetch(PROXY + encodeURIComponent(ADGUARD_URL));
     if (!resp.ok) throw new Error("HTTP " + resp.status);
     const html = await resp.text();
 
-    const urlSet = new Set();
     const patterns = [
       /https:\/\/[^\s<>"'`)\]]+\/dns-query/gi,
       /https:\/\/[^\s<>"'`)\]]+\/doh\/[^\s<>"'`)\]]+/gi,
@@ -183,16 +257,16 @@ async function scrape() {
         if (url.length > 15 && url.startsWith("https://")) urlSet.add(url);
       }
     }
-
-    dohList = Array.from(urlSet).sort().map(makeEntry);
-    status.innerHTML = "";
-    if (dohList.length === 0) {
-      status.innerHTML = '<div class="alert-error">未从页面提取到任何 DoH 地址</div>';
-    } else {
-      testAll();
-    }
   } catch (e) {
-    status.innerHTML = '<div class="alert-error">抓取失败: ' + (e.message || "未知错误") + '</div>';
+    status.innerHTML = '<div class="alert-error">AdGuard 抓取失败，仅使用预设列表: ' + (e.message || "未知错误") + '</div>';
+  }
+
+  dohList = Array.from(urlSet).sort().map(makeEntry);
+  if (dohList.length === 0) {
+    status.innerHTML = '<div class="alert-error">未收集到任何 DoH 地址</div>';
+  } else {
+    status.innerHTML = '<div class="alert-success">共收集 ' + dohList.length + ' 个 DoH（AdGuard + 预设列表）</div>';
+    testAll();
   }
 }
 
@@ -200,9 +274,9 @@ async function scrape() {
 async function testSingle(entry) {
   const start = performance.now();
   try {
-    const resp = await fetch(entry.url, { method: "GET", signal: AbortSignal.timeout(10000), cache: "no-store" });
+    const resp = await fetch(entry.url, { method: "GET", mode: "no-cors", signal: AbortSignal.timeout(10000), cache: "no-store" });
     entry.latency = Math.round(performance.now() - start);
-    entry.httpStatus = resp.status;
+    entry.httpStatus = resp.status || 200;
     entry.status = "ok";
     entry.error = null;
   } catch (e) {
